@@ -41,12 +41,23 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
+// Vercel gives every branch/preview deployment its own subdomain
+// (client-<hash>-sonu2015.vercel.app, client-git-main-sonu2015.vercel.app, etc.),
+// so an exact-match list alone breaks on every new deploy. This pattern allows
+// any preview URL of this specific Vercel project while still rejecting
+// unrelated origins even in production.
+const vercelPreviewPattern = /^https:\/\/client(-[a-z0-9-]+)?-sonu2015\.vercel\.app$/;
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        vercelPreviewPattern.test(origin) ||
+        process.env.NODE_ENV !== 'production'
+      ) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -78,6 +89,15 @@ app.use(cookieParser());
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
+
+// Root route - avoids noisy 404s on Render's default health pings / manual visits
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'DailyTrack API is running.',
+    health: '/api/health',
+  });
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import { KeyboardShortcutsModal } from '../common/KeyboardShortcutsModal';
+import { InstallAppButton } from '../common/InstallAppButton';
 
 export const Header = ({
   title,
@@ -68,6 +69,11 @@ export const Header = ({
         {/* Right Side: Page Actions & Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           {actions}
+
+          {/* Install as App */}
+          <div className="hidden lg:block">
+            <InstallAppButton variant="ghost" />
+          </div>
 
           {/* Quick Seed Demo Dataset Button */}
           <button

@@ -7,6 +7,7 @@ import { AppLayout } from './components/layout/AppLayout';
 import { Loader2 } from 'lucide-react';
 
 // Pages
+import { WelcomePage } from './pages/WelcomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -38,7 +39,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/welcome" replace />;
   }
 
   return children;
@@ -70,6 +71,16 @@ export const App = () => {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
+              {/* Landing Page */}
+              <Route
+                path="/welcome"
+                element={
+                  <PublicRoute>
+                    <WelcomePage />
+                  </PublicRoute>
+                }
+              />
+
               {/* Public Auth Routes */}
               <Route
                 path="/login"
