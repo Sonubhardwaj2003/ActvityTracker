@@ -95,7 +95,7 @@ export const LoginPage = () => {
             Sign In
           </Button>
 
-          {/* 1-Click Demo Login */}
+          {/* 1-Click Demo Login
           <div className="pt-2">
             <button
               type="button"
@@ -106,7 +106,7 @@ export const LoginPage = () => {
               <Sparkles className="w-3.5 h-3.5" />
               <span>One-Click Demo Sign In (Sonu)</span>
             </button>
-          </div>
+          </div> */}
         </form>
 
         {/* Footer */}
