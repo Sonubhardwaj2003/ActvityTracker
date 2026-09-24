@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-surface-100;
+  }
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-300 dark:bg-surface-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-surface-400 dark:bg-surface-600;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Glassmorphism subtle surface */
+.glass-panel {
+  @apply bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border border-surface-200/80 dark:border-surface-800/80 shadow-sm;
+}
+
+.glass-dropdown {
+  @apply bg-white/95 dark:bg-surface-900/95 backdrop-blur-lg border border-surface-200 dark:border-surface-800 shadow-xl;
+}
