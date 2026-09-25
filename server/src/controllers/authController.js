@@ -4,11 +4,22 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
   const token = user.generateAuthToken();
 
   const isProduction = process.env.NODE_ENV === 'production';
+
+  // The frontend (Vercel) and backend (Render) live on different domains, so
+  // this is a cross-site request from the browser's point of view. A cookie
+  // with SameSite=Strict (or even Lax) is NEVER sent on cross-site requests —
+  // only SameSite=None (which requires Secure) works here. Even with that
+  // fixed, browsers with strict third-party-cookie blocking (Safari ITP,
+  // Brave, Firefox ETP, and installed/standalone PWAs especially on iOS) may
+  // still drop the cookie entirely. So the cookie below is kept only as a
+  // best-effort secondary mechanism — the primary auth mechanism is the
+  // Bearer token returned in the JSON body, stored client-side and sent as
+  // an Authorization header (see client/src/api/client.js).
   const cookieOptions = {
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
   };
 
   res

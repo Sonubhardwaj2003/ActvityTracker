@@ -27,7 +27,7 @@ export const GoalsPage = () => {
       if (goalsRes.success) setGoals(goalsRes.goals || []);
       if (actRes.success) setActivities(actRes.activities || []);
     } catch (err) {
-      error('Failed to load goals.');
+      error(err.message || 'Failed to load goals.');
     } finally {
       setLoading(false);
     }

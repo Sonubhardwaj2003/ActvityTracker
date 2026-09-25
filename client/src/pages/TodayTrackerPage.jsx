@@ -56,7 +56,7 @@ export const TodayTrackerPage = () => {
         setItems(res.items || []);
       }
     } catch (err) {
-      error('Failed to load tracking logs.');
+      error(err.message || 'Failed to load tracking logs.');
     } finally {
       setLoading(false);
     }

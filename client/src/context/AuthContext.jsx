@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authApi } from '../api/authApi';
+import { getAuthToken, setAuthToken, clearAuthToken } from '../api/client';
 import { useToast } from './ToastContext';
 
 const AuthContext = createContext();
@@ -10,6 +11,13 @@ export const AuthProvider = ({ children }) => {
   const { success, error } = useToast();
 
   const fetchCurrentUser = useCallback(async () => {
+    // No token stored means we were never logged in on this device/browser —
+    // skip the network round trip and land straight on the welcome page.
+    if (!getAuthToken()) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const res = await authApi.getMe();
@@ -33,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authApi.login({ email, password });
       if (res.success && res.user) {
+        if (res.token) setAuthToken(res.token);
         setUser(res.user);
         success(`Welcome back, ${res.user.name}!`);
         return { success: true };
@@ -47,6 +56,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authApi.register({ name, email, password });
       if (res.success && res.user) {
+        if (res.token) setAuthToken(res.token);
         setUser(res.user);
         success(`Account created! Welcome to DailyTrack, ${res.user.name}.`);
         return { success: true };
@@ -60,10 +70,12 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authApi.logout();
+    } catch (err) {
+      // ignore — we're clearing local state regardless
+    } finally {
+      clearAuthToken();
       setUser(null);
       success('Logged out successfully.');
-    } catch (err) {
-      setUser(null);
     }
   };
 

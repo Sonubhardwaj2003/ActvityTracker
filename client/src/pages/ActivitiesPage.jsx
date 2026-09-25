@@ -34,7 +34,7 @@ export const ActivitiesPage = () => {
         setActivities(res.activities || []);
       }
     } catch (err) {
-      error('Failed to load activities.');
+      error(err.message || 'Failed to load activities.');
     } finally {
       setLoading(false);
     }
