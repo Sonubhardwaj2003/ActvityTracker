@@ -58,6 +58,40 @@ const goalSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // 'auto'   -> progress is computed from the sum of actualValue on linked
+    //             DailyLog entries (e.g. "3 coding questions" logged today
+    //             count toward a 100-question target automatically).
+    // 'manual' -> progress is derived from milestone checkboxes, or left as
+    //             whatever was last saved (legacy behavior).
+    trackingMode: {
+      type: String,
+      enum: ['manual', 'auto'],
+      default: 'manual',
+    },
+    targetValue: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+    targetUnit: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    // Only logs on/after this date count toward the goal. Defaults to the
+    // goal's creation date the first time it's saved.
+    progressStartDate: {
+      type: String, // YYYY-MM-DD
+      default: null,
+    },
+    // Cached sum of linked activity logs, refreshed on every read/write —
+    // stored (rather than computed purely on the fly) so it's available to
+    // exports, the dashboard, and anywhere else that reads a goal directly
+    // from the database without going through the recompute helper.
+    currentValue: {
+      type: Number,
+      default: 0,
+    },
     currentProgress: {
       type: Number,
       min: 0,

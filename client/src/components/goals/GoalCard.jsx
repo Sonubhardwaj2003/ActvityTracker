@@ -1,21 +1,33 @@
 import React from 'react';
 import { Card } from '../common/Card';
-import { Target, CheckCircle2, Clock, Calendar, CheckSquare, Square, Trash2, Edit } from 'lucide-react';
+import { Target, CheckCircle2, Clock, Calendar, CheckSquare, Square, Trash2, Edit, Zap } from 'lucide-react';
 import { formatDisplayDate, formatShortDate } from '../../utils/dateUtils';
 import { getIconComponent } from '../../utils/formatters';
 
 export const GoalCard = ({ goal, onToggleMilestone, onEdit, onDelete }) => {
   const completedMilestones = (goal.milestones || []).filter((m) => m.completed).length;
   const totalMilestones = (goal.milestones || []).length;
+  const isAuto = goal.trackingMode === 'auto' && goal.targetValue > 0;
 
   return (
     <Card className="p-5 flex flex-col justify-between" hoverEffect>
       <div>
         {/* Top header: Category, Deadline, Actions */}
         <div className="flex items-start justify-between gap-3 mb-2">
-          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-            {goal.category}
-          </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+              {goal.category}
+            </span>
+            {isAuto && (
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                title="Progress updates automatically from your daily activity logs"
+              >
+                <Zap className="w-3 h-3" />
+                Auto-tracked
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-1.5">
             {goal.deadline && (
@@ -56,7 +68,15 @@ export const GoalCard = ({ goal, onToggleMilestone, onEdit, onDelete }) => {
         {/* Progress bar */}
         <div className="mt-4 space-y-1.5">
           <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-surface-600 dark:text-surface-300">Overall Progress</span>
+            <span className="text-surface-600 dark:text-surface-300">
+              Overall Progress
+              {isAuto && (
+                <span className="ml-1.5 font-normal text-surface-400 dark:text-surface-500">
+                  ({goal.currentValue || 0} / {goal.targetValue}
+                  {goal.targetUnit ? ` ${goal.targetUnit}` : ''})
+                </span>
+              )}
+            </span>
             <span className="text-brand-500">{goal.currentProgress}%</span>
           </div>
           <div className="w-full h-2 rounded-full bg-surface-100 dark:bg-surface-800 overflow-hidden">

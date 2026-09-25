@@ -37,8 +37,22 @@ const features = [
 
 export const WelcomePage = () => {
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex flex-col">
-      <header className="px-6 py-5 flex items-center justify-between max-w-6xl mx-auto w-full">
+    <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex flex-col relative overflow-hidden">
+      {/* Full-bleed decorative background — fills the wide gutters on large
+          monitors instead of leaving flat empty space either side of a
+          narrow centered column. */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.4] dark:opacity-[0.25]"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, rgba(3,105,161,0.35) 1px, transparent 1px)',
+          backgroundSize: '28px 28px',
+        }}
+      />
+      <div className="pointer-events-none absolute -top-40 -left-40 w-[36rem] h-[36rem] rounded-full bg-brand-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -right-40 w-[36rem] h-[36rem] rounded-full bg-brand-400/20 blur-3xl" />
+
+      <header className="relative px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between w-full">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
             <Flame className="w-5 h-5 fill-white" />
@@ -52,20 +66,20 @@ export const WelcomePage = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center max-w-3xl mx-auto">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-10 py-12 text-center">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-semibold mb-6">
           <Sparkles className="w-3.5 h-3.5" />
           Your personal productivity OS
         </span>
 
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-surface-900 dark:text-white leading-tight">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-surface-900 dark:text-white leading-tight max-w-4xl">
           Build habits that
           <span className="bg-gradient-to-tr from-brand-600 to-brand-400 bg-clip-text text-transparent">
             {' '}
             actually stick
           </span>
         </h1>
-        <p className="mt-4 text-sm sm:text-base text-surface-500 dark:text-surface-400 max-w-xl">
+        <p className="mt-4 text-sm sm:text-base lg:text-lg text-surface-500 dark:text-surface-400 max-w-xl lg:max-w-2xl">
           Track daily activities, hold your streaks, hit your goals, and review your
           progress — all in one fast, installable app.
         </p>
@@ -99,11 +113,11 @@ export const WelcomePage = () => {
           </span>
         </div>
 
-        <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
+        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-5xl">
           {features.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-2xl p-4 text-left"
+              className="bg-white/90 dark:bg-surface-900/90 backdrop-blur border border-surface-200 dark:border-surface-800 rounded-2xl p-4 text-left"
             >
               <div className="w-8 h-8 rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3">
                 <Icon className="w-4 h-4" />
@@ -119,7 +133,7 @@ export const WelcomePage = () => {
         </div>
       </main>
 
-      <footer className="text-center text-[11px] text-surface-400 dark:text-surface-600 py-6">
+      <footer className="relative text-center text-[11px] text-surface-400 dark:text-surface-600 py-6">
         DailyTrack — Productivity OS
       </footer>
     </div>

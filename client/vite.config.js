@@ -53,6 +53,12 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Makes a newly-installed service worker take over immediately
+        // instead of waiting for every open tab to be closed first — this
+        // is the core fix for "the installed app never picks up updates
+        // unless I uninstall and reinstall it".
+        skipWaiting: true,
+        clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [

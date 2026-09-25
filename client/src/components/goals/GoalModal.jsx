@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Zap, ListChecks } from 'lucide-react';
+
+const emptyForm = {
+  title: '',
+  description: '',
+  category: 'Career',
+  deadline: '',
+  relatedActivityIds: [],
+  milestones: [],
+  trackingMode: 'manual',
+  targetValue: '',
+  targetUnit: '',
+};
 
 export const GoalModal = ({
   isOpen,
@@ -11,14 +23,7 @@ export const GoalModal = ({
   goal = null,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: 'Career',
-    deadline: '',
-    relatedActivityIds: [],
-    milestones: [],
-  });
+  const [formData, setFormData] = useState(emptyForm);
 
   const [newMilestoneText, setNewMilestoneText] = useState('');
 
@@ -31,18 +36,16 @@ export const GoalModal = ({
         deadline: goal.deadline || '',
         relatedActivityIds: (goal.relatedActivityIds || []).map((a) => a._id || a),
         milestones: goal.milestones || [],
+        trackingMode: goal.trackingMode === 'auto' ? 'auto' : 'manual',
+        targetValue: goal.targetValue ?? '',
+        targetUnit: goal.targetUnit || '',
       });
     } else {
-      setFormData({
-        title: '',
-        description: '',
-        category: 'Career',
-        deadline: '',
-        relatedActivityIds: [],
-        milestones: [],
-      });
+      setFormData(emptyForm);
     }
   }, [goal, isOpen]);
+
+  const isAuto = formData.trackingMode === 'auto';
 
   const handleAddMilestone = () => {
     if (!newMilestoneText.trim()) return;
@@ -73,7 +76,14 @@ export const GoalModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim()) return;
-    onSubmit(formData);
+    if (isAuto && (!formData.targetValue || Number(formData.targetValue) <= 0)) return;
+    if (isAuto && formData.relatedActivityIds.length === 0) return;
+
+    onSubmit({
+      ...formData,
+      targetValue: isAuto ? Number(formData.targetValue) : null,
+      targetUnit: isAuto ? formData.targetUnit : '',
+    });
   };
 
   return (
@@ -139,10 +149,88 @@ export const GoalModal = ({
           </div>
         </div>
 
+        {/* Tracking Mode */}
+        <div>
+          <label className="block text-xs font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
+            How should progress update?
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setFormData((p) => ({ ...p, trackingMode: 'auto' }))}
+              className={`flex items-start gap-2 p-2.5 rounded-xl border text-left transition-all ${
+                isAuto
+                  ? 'bg-brand-500/10 border-brand-500 text-brand-700 dark:text-brand-300'
+                  : 'bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-300'
+              }`}
+            >
+              <Zap className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>
+                <span className="block text-xs font-semibold">Auto-track</span>
+                <span className="block text-[10px] opacity-80 leading-tight mt-0.5">
+                  From daily activity logs
+                </span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData((p) => ({ ...p, trackingMode: 'manual' }))}
+              className={`flex items-start gap-2 p-2.5 rounded-xl border text-left transition-all ${
+                !isAuto
+                  ? 'bg-brand-500/10 border-brand-500 text-brand-700 dark:text-brand-300'
+                  : 'bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-300'
+              }`}
+            >
+              <ListChecks className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>
+                <span className="block text-xs font-semibold">Manual / Milestones</span>
+                <span className="block text-[10px] opacity-80 leading-tight mt-0.5">
+                  Check off milestones yourself
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {isAuto && (
+          <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-brand-500/5 border border-brand-500/20">
+            <div>
+              <label className="block text-xs font-semibold text-surface-700 dark:text-surface-300 mb-1">
+                Target Value *
+              </label>
+              <input
+                type="number"
+                min="1"
+                required={isAuto}
+                placeholder="100"
+                value={formData.targetValue}
+                onChange={(e) => setFormData((p) => ({ ...p, targetValue: e.target.value }))}
+                className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 text-surface-900 dark:text-surface-100 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-surface-700 dark:text-surface-300 mb-1">
+                Unit
+              </label>
+              <input
+                type="text"
+                placeholder="questions"
+                value={formData.targetUnit}
+                onChange={(e) => setFormData((p) => ({ ...p, targetUnit: e.target.value }))}
+                className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 text-surface-900 dark:text-surface-100 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              />
+            </div>
+            <p className="col-span-2 text-[11px] text-surface-500 dark:text-surface-400 leading-relaxed">
+              Every day's logged value for the activities you link below gets added up. Once the
+              total reaches your target, this goal marks itself complete automatically.
+            </p>
+          </div>
+        )}
+
         {/* Link Daily Habits */}
         <div>
           <label className="block text-xs font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
-            Link Supporting Activities:
+            {isAuto ? 'Link Activities to Track *' : 'Link Supporting Activities:'}
           </label>
           <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
             {activities.map((act) => {
@@ -165,7 +253,9 @@ export const GoalModal = ({
           </div>
         </div>
 
-        {/* Milestones list */}
+        {/* Milestones list — manual-tracking goals only; auto-tracked goals
+            derive progress from daily logs instead. */}
+        {!isAuto && (
         <div>
           <label className="block text-xs font-semibold text-surface-700 dark:text-surface-300 mb-1">
             Milestones
@@ -207,6 +297,7 @@ export const GoalModal = ({
             ))}
           </div>
         </div>
+        )}
 
         <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-200 dark:border-surface-800">
           <Button variant="ghost" type="button" onClick={onClose} disabled={isLoading}>
